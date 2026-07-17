@@ -1,0 +1,1 @@
+# wildpalace-seo-plp
