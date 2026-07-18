@@ -3,6 +3,7 @@ import { z } from "zod";
 import { aiModel } from "../ai-config";
 import { COLORS, MATERIALS, ROOMS, STYLES } from "./vocab";
 import type { ParsedIntent } from "./types";
+import { throttledAiCall } from "../ai-throttle/throttle";
 
 // --- Rules-based extraction ---
 // Finds the first matching term from a vocab list inside the keyword string.
@@ -44,10 +45,13 @@ const fuzzySchema = z.object({
 async function parseFuzzyFieldsWithAI(
   keyword: string,
 ): Promise<z.infer<typeof fuzzySchema>> {
-  const { object } = await generateObject({
-    model: aiModel,
-    schema: fuzzySchema,
-    prompt: `Extract the qualifying attribute, use case, and target audience from this wallpaper search query. Return null for any field that isn't clearly present.\n\nQuery: "${keyword}"`,
+  const object = await throttledAiCall(async () => {
+    const { object } = await generateObject({
+      model: aiModel,
+      schema: fuzzySchema,
+      prompt: `Extract the qualifying attribute, use case, and target audience from this wallpaper search query. Return null for any field that isn't clearly present.\n\nQuery: "${keyword}"`,
+    });
+    return object;
   });
   return object;
 }

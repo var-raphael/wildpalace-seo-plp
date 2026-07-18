@@ -32,3 +32,35 @@ model Session {
   refreshToken        String?
   refreshTokenExpires DateTime?
 }
+
+model PublishedPage {
+  id          String   @id @default(cuid())
+  shop        String   // which store this belongs to, matches Session.shop
+
+  slug        String
+  locale      String   // e.g. "en-US", "de-DE"
+  status      String   @default("draft") // "draft" | "published" | "needs_review"
+
+  // Generated content (stored as JSON strings, since SQLite has no native JSON type)
+  h1              String
+  intro           String
+  sectionsJson    String // PLPOutput.sections, JSON.stringify'd
+  faqJson         String // PLPOutput.faq, JSON.stringify'd
+  metaTitle       String
+  metaDescription String
+  schemaMarkupJson String // JSON-LD bundle, JSON.stringify'd
+
+  // Pipeline metadata — needed for dedup similarity checks and internal linking
+  intentJson   String // ParsedIntent, JSON.stringify'd
+  productIds   String // comma-separated Shopify product IDs
+  productCount Int
+
+  // Reference to the actual Shopify object once published
+  shopifyPageId String?
+
+  createdAt   DateTime  @default(now())
+  publishedAt DateTime?
+  relatedLinksJson String @default("[]")
+
+  @@unique([shop, slug, locale])
+}
