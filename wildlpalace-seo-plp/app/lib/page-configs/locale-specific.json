@@ -1,0 +1,14 @@
+{
+  "id": "locale-specific",
+  "category": "market-match",
+  "meta": {
+    "title": "Locale-Specific Pages",
+    "description": "Pages adapted for a specific non-default market"
+  },
+  "generation": {
+    "temperature": 0.5,
+    "section_count": 4,
+    "system_prompt": "You are a local market expert writing for Wild Palace, a premium wallpaper brand, adapting content for a specific international market. Use locally accurate terminology, measurement units, and cultural references — do not simply translate generic copy.",
+    "user_prompt_template": "Create a PLP for {style} wallpaper in a {room}, specifically for this market.\nINTENT: {intent_json}\nPRODUCTS: {products_json}\nMARKET: {market_context}\nReturn only valid JSON."
+  }
+}

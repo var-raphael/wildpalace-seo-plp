@@ -54,4 +54,22 @@ export const MOCK_CATALOG: MockProduct[] = [
     tags: ["navy", "nautical", "playful"],
     collection: "kids-room",
   },
+  {
+    id: "9",
+    title: "Coastal Linen Living Room Wallpaper",
+    tags: ["linen", "coastal", "neutral"],
+    collection: "living-room",
+  },
+  {
+    id: "10",
+    title: "Modern Abstract Living Room Wallpaper",
+    tags: ["abstract", "modern", "grey"],
+    collection: "living-room",
+  },
+  {
+    id: "11",
+    title: "Vintage Floral Living Room Wallpaper",
+    tags: ["vintage", "floral", "warm"],
+    collection: "living-room",
+  },
 ];

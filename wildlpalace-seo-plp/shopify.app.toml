@@ -49,3 +49,48 @@ required = true
 [metaobjects.app.example.fields.description]
 name = "Description"
 type = "multi_line_text_field"
+
+
+[metaobjects.app.plp]
+name = "PLP"
+description = "A generated SEO product listing page"
+
+  [metaobjects.app.plp.access]
+  admin = "merchant_read_write"
+
+[metaobjects.app.plp.fields.title]
+name = "Title"
+type = "single_line_text_field"
+required = true
+
+[metaobjects.app.plp.fields.intro]
+name = "Intro"
+type = "multi_line_text_field"
+
+[metaobjects.app.plp.fields.sections]
+name = "Sections"
+type = "multi_line_text_field"
+
+[metaobjects.app.plp.fields.faq]
+name = "FAQ"
+type = "multi_line_text_field"
+
+[metaobjects.app.plp.fields.meta_title]
+name = "Meta Title"
+type = "single_line_text_field"
+
+[metaobjects.app.plp.fields.meta_description]
+name = "Meta Description"
+type = "multi_line_text_field"
+
+[metaobjects.app.plp.fields.schema_markup]
+name = "Schema Markup"
+type = "multi_line_text_field"
+
+[metaobjects.app.plp.fields.locale]
+name = "Locale"
+type = "single_line_text_field"
+
+[metaobjects.app.plp.fields.slug]
+name = "Slug"
+type = "single_line_text_field"

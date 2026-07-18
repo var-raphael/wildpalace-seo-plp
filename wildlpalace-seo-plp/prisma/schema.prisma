@@ -61,6 +61,17 @@ model PublishedPage {
   createdAt   DateTime  @default(now())
   publishedAt DateTime?
   relatedLinksJson String @default("[]")
+  altTextsJson String @default("{}")
 
   @@unique([shop, slug, locale])
+}
+
+model ShopSettings {
+  id           String @id @default(cuid())
+  shop         String @unique
+  aiProvider   String @default("mistral")
+  aiModel      String @default("mistral-large-latest")
+  defaultLocale String @default("en-US")
+  brandTone    String @default("")
+  competitorUrls String @default("")
 }

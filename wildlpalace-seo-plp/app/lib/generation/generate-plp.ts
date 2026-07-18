@@ -1,16 +1,19 @@
-// app/lib/generation/generate-plp.ts
 import { generateObject } from "ai";
 import { aiModel } from "../ai-config";
 import { plpOutputSchema, type PLPOutput } from "./schema";
+import { getLocaleConfig } from "../locale/config";
+import {
+  selectPageConfig,
+  getPageConfig,
+  fillPromptTemplate,
+} from "./page-config-loader";
 import type { ParsedIntent } from "../intent/types";
 import type { MockProduct } from "../matching/mock-catalog";
-import { getLocaleConfig } from "../locale/config";
-
 
 interface GeneratePLPInput {
   intent: ParsedIntent;
   products: MockProduct[];
-  locale: string; // e.g. "en-US", "en-AU"
+  locale: string;
 }
 
 const MAX_RETRIES = 2;
@@ -20,24 +23,28 @@ export async function generatePLPContent(
 ): Promise<PLPOutput> {
   const { intent, products, locale } = input;
 
-  const systemPrompt = `You are an interior design and SEO expert writing product listing pages for Wild Palace, a premium wallpaper brand. Write content that is genuinely useful and specific to the given intent — never generic keyword-stuffed filler. Each page must have a real reason to exist: differentiate it clearly from adjacent pages targeting similar but distinct queries.`;
+  const localeConfig = getLocaleConfig(locale);
 
-const localeConfig = getLocaleConfig(locale);
+  // Select and load the page-type config — this is what makes prompting
+  // genuinely different per page type (style-room vs use-case vs
+  // locale-specific), rather than one shared prompt for everything.
+  const configId = selectPageConfig(intent, locale);
+  const pageConfig = getPageConfig(configId);
 
-const userPrompt = `Create a PLP for the following intent and matched products.
+  const marketContext = `Language: ${localeConfig.language} — write entirely in this language. Measurement system: ${localeConfig.measurementSystem} (use ${localeConfig.measurementSystem === "imperial" ? "feet/inches" : "centimeters/meters"} for dimensions). Currency: ${localeConfig.currency} (${localeConfig.currencySymbol}). Local terminology: ${JSON.stringify(localeConfig.terminology)} — use these exact terms.`;
 
-INTENT: ${JSON.stringify(intent)}
-PRODUCTS: ${JSON.stringify(products.map((p) => ({ title: p.title, tags: p.tags })))}
+  const productsJson = JSON.stringify(
+    products.map((p) => ({ title: p.title, tags: p.tags })),
+  );
 
-MARKET CONTEXT:
-- Language: ${localeConfig.language} — write entirely in this language
-- Measurement system: ${localeConfig.measurementSystem} (use ${localeConfig.measurementSystem === "imperial" ? "feet/inches" : "centimeters/meters"} for any dimensions)
-- Currency: ${localeConfig.currency} (${localeConfig.currencySymbol}) — use this if referencing price
-- Local terminology: ${JSON.stringify(localeConfig.terminology)} — use these exact local terms, not generic ones
-
-Write copy specific to this exact combination of attributes and this exact market — do not write generic wallpaper copy that could apply to any page or any country. Reference the specific style, room, and qualifying attributes naturally throughout.
-
-IMPORTANT: meta_title must be 60 characters or fewer — count carefully before responding.`;
+  const userPrompt =
+    fillPromptTemplate(
+      pageConfig.generation.user_prompt_template,
+      intent,
+      productsJson,
+      marketContext,
+    ) +
+    `\n\nWrite copy specific to this exact combination of attributes and this exact market — do not write generic wallpaper copy that could apply to any page or any country. IMPORTANT: meta_title must be 60 characters or fewer — count carefully before responding.`;
 
   let lastError: unknown;
 
@@ -46,16 +53,14 @@ IMPORTANT: meta_title must be 60 characters or fewer — count carefully before 
       const { object } = await generateObject({
         model: aiModel,
         schema: plpOutputSchema,
-        system: systemPrompt,
+        system: pageConfig.generation.system_prompt,
         prompt: userPrompt,
-        temperature: 0.5,
+        temperature: pageConfig.generation.temperature,
       });
       return object;
     } catch (err: any) {
       lastError = err;
       console.warn(`Generation attempt ${attempt + 1} failed:`, err?.message);
-      if (err?.cause) console.warn("Cause:", JSON.stringify(err.cause, null, 2));
-      if (err?.text) console.warn("Raw model output:", err.text);
     }
   }
 

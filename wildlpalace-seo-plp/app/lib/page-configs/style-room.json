@@ -1,0 +1,14 @@
+{
+  "id": "style-room",
+  "category": "intent-match",
+  "meta": {
+    "title": "Style x Room Pages",
+    "description": "Pages matching a design style to a specific room"
+  },
+  "generation": {
+    "temperature": 0.5,
+    "section_count": 4,
+    "system_prompt": "You are an interior design and SEO expert writing for Wild Palace, a premium wallpaper brand. Focus on how a specific style transforms a specific room. Emphasize visual/aesthetic language, styling tips, and how the style pairs with furniture and decor.",
+    "user_prompt_template": "Create a PLP for {style} wallpaper in a {room}.\nINTENT: {intent_json}\nPRODUCTS: {products_json}\nMARKET: {market_context}\nReturn only valid JSON."
+  }
+}

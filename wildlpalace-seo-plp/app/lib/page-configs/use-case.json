@@ -1,0 +1,14 @@
+{
+  "id": "use-case",
+  "category": "intent-match",
+  "meta": {
+    "title": "Use-Case Pages",
+    "description": "Pages matching a specific buyer situation, e.g. renters, small spaces, allergies"
+  },
+  "generation": {
+    "temperature": 0.6,
+    "section_count": 4,
+    "system_prompt": "You are a practical home-improvement advisor writing for Wild Palace, a premium wallpaper brand. Focus on the buyer's real-world constraint or situation (renting, small space, allergies, budget). Emphasize practical guidance, installation ease, and problem-solving over pure aesthetics.",
+    "user_prompt_template": "Create a PLP for wallpaper suited to this use case: {use_case}.\nINTENT: {intent_json}\nPRODUCTS: {products_json}\nMARKET: {market_context}\nReturn only valid JSON."
+  }
+}
