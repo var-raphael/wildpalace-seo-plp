@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { useFetcher, useNavigate } from "react-router";
+import Papa from "papaparse";
 import { authenticate } from "../shopify.server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -9,18 +10,22 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 function parseKeywordCsv(text: string): string[] {
-  const lines = text
-    .split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const cleanText = text.replace(/^\uFEFF/, "").replace(/^\u00EF\u00BB\u00BF/, "");
 
-  const firstLine = lines[0]?.toLowerCase();
-  const hasHeader = firstLine === "keyword" || firstLine === "keywords";
-  const dataLines = hasHeader ? lines.slice(1) : lines;
+  const result = Papa.parse<string[]>(cleanText, {
+    skipEmptyLines: true,
+  });
 
-  return dataLines
-    .map((line) => line.split(",")[0].replace(/^"|"$/g, "").trim())
-    .filter((kw) => kw.length > 0);
+  const rows = result.data;
+  if (rows.length === 0) return [];
+
+  const firstCell = rows[0][0]?.toLowerCase().trim();
+  const hasHeader = firstCell === "keyword" || firstCell === "keywords";
+  const dataRows = hasHeader ? rows.slice(1) : rows;
+
+  return dataRows
+    .map((row) => row[0]?.trim())
+    .filter((kw): kw is string => Boolean(kw && kw.length > 0));
 }
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -33,7 +38,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return { error: "Please choose a CSV file.", keywords: undefined };
   }
 
-  const text = await file.text();
+  const buffer = await file.arrayBuffer();
+  const text = new TextDecoder("utf-8").decode(buffer);
   const keywords = parseKeywordCsv(text);
 
   if (keywords.length === 0) {
@@ -73,6 +79,7 @@ export default function CsvUpload() {
           disabled={isLoading}
         />
         {fileName && <s-paragraph>Selected: {fileName}</s-paragraph>}
+        {isLoading && <s-paragraph>Processing file...</s-paragraph>}
       </s-section>
 
       {result && (
