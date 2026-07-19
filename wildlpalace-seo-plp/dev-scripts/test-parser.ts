@@ -1,4 +1,4 @@
-import { parseIntent } from "./parser";
+import { parseIntent } from "../app/lib/intent/parser";
 
 const testKeywords = [
   "sustainable midnight blue wallpaper kids room",

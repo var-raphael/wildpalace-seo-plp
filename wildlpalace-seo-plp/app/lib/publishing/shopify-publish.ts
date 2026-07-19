@@ -54,3 +54,31 @@ export async function publishPlpMetaobject(
     errors,
   };
 }
+
+
+export async function deletePlpMetaobject(
+  admin: any,
+  metaobjectId: string,
+): Promise<{ deletedId: string | null; errors: string[] }> {
+  const response = await admin.graphql(
+    `#graphql
+      mutation deletePlpMetaobject($id: ID!) {
+        metaobjectDelete(id: $id) {
+          deletedId
+          userErrors { field message }
+        }
+      }`,
+    {
+      variables: { id: metaobjectId },
+    },
+  );
+
+  const json = await response.json();
+  const result = json.data?.metaobjectDelete;
+  const errors = (result?.userErrors ?? []).map((e: any) => e.message);
+
+  return {
+    deletedId: result?.deletedId ?? null,
+    errors,
+  };
+}

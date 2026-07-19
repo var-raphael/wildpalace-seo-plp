@@ -1,8 +1,8 @@
-import { parseIntent } from "../intent/parser";
-import { matchProducts } from "../matching/matcher";
-import { MOCK_CATALOG } from "../matching/mock-catalog";
-import { generatePLPContent } from "./generate-plp";
-import { getLocaleConfig } from "../locale/config";
+import { parseIntent } from "../app/lib/intent/parser";
+import { matchProducts } from "../app/lib/matching/matcher";
+import { MOCK_CATALOG } from "../app/lib/matching/mock-catalog";
+import { generatePLPContent } from "../app/lib/generation/generate-plp";
+import { getLocaleConfig } from "../app/lib/locale/config";
 
 async function main() {
   const keyword = "botanical wallpaper living room";

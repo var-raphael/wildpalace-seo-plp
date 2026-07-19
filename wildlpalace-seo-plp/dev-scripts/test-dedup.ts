@@ -1,6 +1,6 @@
-import { parseIntent } from "../intent/parser";
-import { clusterKeywords } from "./clustering";
-import { checkAgainstExistingPages, type PublishedPage } from "./similarity";
+import { parseIntent } from "../app/lib/intent/parser";
+import { clusterKeywords } from "../app/lib/dedup/clustering";
+import { checkAgainstExistingPages, type PublishedPage } from "../app/lib/dedup/similarity";
 
 async function main() {
   const keywordBatch = [

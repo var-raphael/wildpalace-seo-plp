@@ -1,6 +1,6 @@
-import { parseIntent } from "../intent/parser";
-import { matchProducts } from "./matcher";
-import { MOCK_CATALOG } from "./mock-catalog";
+import { parseIntent } from "../app/lib/intent/parser";
+import { matchProducts } from "../app/lib/matching/matcher";
+import { MOCK_CATALOG } from "../app/lib/matching/mock-catalog";
 
 const testKeywords = [
   "sustainable midnight blue wallpaper kids room",

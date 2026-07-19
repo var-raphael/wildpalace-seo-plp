@@ -1,13 +1,13 @@
-import { parseIntent } from "../intent/parser";
-import { matchProducts } from "../matching/matcher";
-import { MOCK_CATALOG } from "../matching/mock-catalog";
-import { generatePLPContent } from "../generation/generate-plp";
+import { parseIntent } from "../app/lib/intent/parser";
+import { matchProducts } from "../app/lib/matching/matcher";
+import { MOCK_CATALOG } from "../app/lib/matching/mock-catalog";
+import { generatePLPContent } from "../app/lib/generation/generate-plp";
 import {
   recordPublishedPage,
   getAllPublishedPages,
-} from "./published-pages";
-import { generateLlmsTxt } from "./llms-txt";
-import { generateSitemapAi } from "./sitemap-ai";
+} from "../app/lib/ai-presence/published-pages";
+import { generateLlmsTxt } from "../app/lib/ai-presence/llms-txt";
+import { generateSitemapAi } from "../app/lib/ai-presence/sitemap-ai";
 
 const STORE_URL = "https://wildpalace.com";
 const STORE_NAME = "Wild Palace";

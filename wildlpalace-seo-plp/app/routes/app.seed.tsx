@@ -62,10 +62,27 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { admin } = await authenticate.admin(request);
 
-  // --- Step 1: create collections, remember their IDs by handle ---
+  // --- Step 1: create collections, remember their IDs by handle.
+  // Skips creation if a collection with that handle already exists, so
+  // re-running seed doesn't error or duplicate. ---
   const collectionIds: Record<string, string> = {};
 
   for (const col of COLLECTIONS) {
+    const existingResponse = await admin.graphql(
+      `#graphql
+        query findCollectionByHandle($handle: String!) {
+          collectionByHandle(handle: $handle) { id handle }
+        }`,
+      { variables: { handle: col.handle } },
+    );
+    const existingJson = await existingResponse.json();
+    const existing = existingJson.data?.collectionByHandle;
+
+    if (existing) {
+      collectionIds[col.handle] = existing.id;
+      continue;
+    }
+
     const response = await admin.graphql(
       `#graphql
         mutation createCollection($input: CollectionInput!) {
@@ -81,10 +98,28 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (created) collectionIds[col.handle] = created.id;
   }
 
-  // --- Step 2: create each product with its tags ---
+  // --- Step 2: create each product with its tags, skipping any that
+  // already exist by title so re-running seed doesn't duplicate the catalog ---
   const createdProducts: any[] = [];
 
   for (const p of PRODUCTS) {
+    const existingResponse = await admin.graphql(
+      `#graphql
+        query findProductByTitle($query: String!) {
+          products(first: 1, query: $query) {
+            nodes { id title handle tags }
+          }
+        }`,
+      { variables: { query: `title:'${p.title.replace(/'/g, "\\'")}'` } },
+    );
+    const existingJson = await existingResponse.json();
+    const existing = existingJson.data?.products?.nodes?.[0];
+
+    if (existing) {
+      createdProducts.push({ ...existing, collectionHandle: p.collection });
+      continue;
+    }
+
     const response = await admin.graphql(
       `#graphql
         mutation createProduct($product: ProductCreateInput!) {
